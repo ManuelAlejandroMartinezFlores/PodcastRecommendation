@@ -17,15 +17,17 @@ pip install podcast-recommendation==0.1.4
 
 ## Uso
 ### Import
-```pyhton
+```py
 from podcast_recommendation.algorithm import PodcastRecommendation
 ```
 
 ### Crear objeto
 Para utilizarlo debe tener una DataBase abierta en Neo4j con el plugin de Data Science
 ![db](https://github.com/ManuelAlejandroMartinezFlores/PodcastRecommendation/blob/main/img/neo4j-db.png)
-```python
->>> pr = PodcastRecommendation('bolt://localhost:7687', ('neo4j', 'password'), verbose=True)
+```py
+pr = PodcastRecommendation('bolt://localhost:7687', ('neo4j', 'password'), verbose=True)
+```
+```
 Reading x_train
 Reading y_train
 Training model
@@ -33,8 +35,10 @@ Training complete
 ```
 
 ### Generar grafo
-```python
->>> pr.build_graph(verbose=True)
+```py
+pr.build_graph(verbose=True)
+```
+```
 Reading categories
 Reading ratings
 Creating categories, categories and IsA
@@ -47,8 +51,10 @@ Se genera un grafo como el siguiente:
 
 ### Generar recomendaciones
 Para recomendar podcast al usuario "6C561484AED5C02"
-```python
->>> pr.recommend('6C561484AED5C02')
+```py
+pr.recommend('6C561484AED5C02')
+```
+```
                           podcast_id     proba
 47  b4c3c3ebdd76e284f7d9fa358ac82030  0.999225
 31  c9add5e9e81a4b3ca963adab5b87083f  0.999216
