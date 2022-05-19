@@ -93,7 +93,7 @@ pr.create_podcast(podcast_id='a1a1a1a1a1a1a1a1a1a1a1')
 ```
 
 ### Crear categoria
-Crear podcast de nombre ```cat``` e id ```99``` 
+Crear categoria de nombre ```cat``` e id ```99``` 
 ```py
 pr.create_category(category='cat', category_id=99)
 ```
@@ -104,3 +104,7 @@ Crear relación podcast de id ```a1a1a1a1a1a1a1a1a1a1a1``` IsA categoria de nomb
 pr.create_IsA(podcast_id='a1a1a1a1a1a1a1a1a1a1a1', category='cat')
 ```
 
+### Cerrar driver
+```py
+pr.close()
+```
