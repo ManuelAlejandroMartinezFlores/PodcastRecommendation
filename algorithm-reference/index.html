@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://manuelalejandromartinezflores.github.io/PodcastRecommendation/algorithm-reference/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Algorithm - PodcastRecommendation</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+        <link href="../assets/_mkdocstrings.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Algorithm";
+        var mkdocs_page_input_path = "algorithm-reference.md";
+        var mkdocs_page_url = "/PodcastRecommendation/algorithm-reference/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> PodcastRecommendation
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Code Reference</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Algorithm</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#src.podcast_recommendation.algorithm">src.podcast_recommendation.algorithm</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#src.podcast_recommendation.algorithm.PodcastRecommendation">PodcastRecommendation</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#src.podcast_recommendation.algorithm.PodcastRecommendation.__init__">__init__()</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#src.podcast_recommendation.algorithm.PodcastRecommendation.build_cat">build_cat()</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#src.podcast_recommendation.algorithm.PodcastRecommendation.build_graph">build_graph()</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#src.podcast_recommendation.algorithm.PodcastRecommendation.build_rtg">build_rtg()</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#src.podcast_recommendation.algorithm.PodcastRecommendation.close">close()</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#src.podcast_recommendation.algorithm.PodcastRecommendation.create_category">create_category()</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#src.podcast_recommendation.algorithm.PodcastRecommendation.create_podcast">create_podcast()</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#src.podcast_recommendation.algorithm.PodcastRecommendation.create_rtg">create_rtg()</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#src.podcast_recommendation.algorithm.PodcastRecommendation.create_user">create_user()</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#src.podcast_recommendation.algorithm.PodcastRecommendation.delete_all">delete_all()</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#src.podcast_recommendation.algorithm.PodcastRecommendation.delete_rtg">delete_rtg()</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#src.podcast_recommendation.algorithm.PodcastRecommendation.gen_data">gen_data()</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#src.podcast_recommendation.algorithm.PodcastRecommendation.gen_data_row">gen_data_row()</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#src.podcast_recommendation.algorithm.PodcastRecommendation.recommend">recommend()</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">PodcastRecommendation</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Code Reference &raquo;</li><li>Algorithm</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="algorithm-module">Algorithm module</h1>
+
+
+  <div class="doc doc-object doc-module">
+
+<a id="src.podcast_recommendation.algorithm"></a>
+    <div class="doc doc-contents first">
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h2 id="src.podcast_recommendation.algorithm.PodcastRecommendation" class="doc doc-heading">
+        <code>
+PodcastRecommendation        </code>
+
+
+
+</h2>
+
+    <div class="doc doc-contents ">
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="src.podcast_recommendation.algorithm.PodcastRecommendation.__init__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">,</span> <span class="n">auth</span><span class="p">,</span> <span class="n">x_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Creates object. Reads files to train Logistic Regression model.</p>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li><p><strong>uri</strong> (<code>str</code>) – neo4j uri</p></li>
+            <li><p><strong>auth</strong> (<code>str</code>) – neo4j (user, psw)</p></li>
+            <li><p><strong>x_path</strong> (<code>str</code>) – path to x_train. Defaults to X_PATH.</p></li>
+            <li><p><strong>y_path</strong> (<code>str</code>) – path to y_train. Defaults to Y_PATH.</p></li>
+            <li><p><strong>verbose</strong> (<code>bool</code>) – verbose. Defaults to False.</p></li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="src.podcast_recommendation.algorithm.PodcastRecommendation.build_cat" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">build_cat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Builds relations in categories_sample dataset</p>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li><p><strong>row</strong> (<code>pd.Series</code>) – dataframe row</p></li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="src.podcast_recommendation.algorithm.PodcastRecommendation.build_graph" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">build_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cat_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rtg_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">delete_all</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Builds graph in neo4j</p>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li><p><strong>cat_path</strong> (<code>str</code>) – path to categories_sample. Defaults to CAT_PATH.</p></li>
+            <li><p><strong>rtg_path</strong> (<code>str</code>) – path to ratings_sample. Defaults to RTG_PATH.</p></li>
+            <li><p><strong>delete_all</strong> (<code>bool</code>) – if to delete graph before writting. Defaults to True.</p></li>
+            <li><p><strong>verbose</strong> (<code>bool</code>) – verbose. Defaults to False.</p></li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="src.podcast_recommendation.algorithm.PodcastRecommendation.build_rtg" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">build_rtg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Builds relations in ratings_sample dataset</p>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li><p><strong>row</strong> (<code>pd.Series</code>) – dataframe row</p></li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="src.podcast_recommendation.algorithm.PodcastRecommendation.close" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Closes driver.</p>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="src.podcast_recommendation.algorithm.PodcastRecommendation.create_category" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">create_category</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="n">category_id</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Creates category</p>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li><p><strong>category</strong> (<code>str</code>) – category name</p></li>
+            <li><p><strong>category_id</strong> (<code>int</code>) – category id</p></li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="src.podcast_recommendation.algorithm.PodcastRecommendation.create_podcast" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">create_podcast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Creates a podcast</p>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li><p><strong>podcast_id</strong> (<code>str</code>) – podcast id</p></li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="src.podcast_recommendation.algorithm.PodcastRecommendation.create_rtg" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">create_rtg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">,</span> <span class="n">rating</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Create rating relationship</p>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li><p><strong>user_id</strong> (<code>str</code>) – user id</p></li>
+            <li><p><strong>podcast_id</strong> (<code>str</code>) – podcast id</p></li>
+            <li><p><strong>rating</strong> (<code>int</code>) – rating</p></li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="src.podcast_recommendation.algorithm.PodcastRecommendation.create_user" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">create_user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Creates user</p>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li><p><strong>user_id</strong> (<code>str</code>) – user id</p></li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="src.podcast_recommendation.algorithm.PodcastRecommendation.delete_all" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">delete_all</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Deletes all elements in the graph</p>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="src.podcast_recommendation.algorithm.PodcastRecommendation.delete_rtg" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">delete_rtg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Deletes rating relationship</p>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li><p><strong>user_id</strong> (<code>str</code>) – user id</p></li>
+            <li><p><strong>podcast_id</strong> (<code>str</code>) – podcast id</p></li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="src.podcast_recommendation.algorithm.PodcastRecommendation.gen_data" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">gen_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Generates data for podcast recommendation</p>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li><p><strong>df</strong> (<code>pd.DataFrame</code>) – podcasts</p></li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+    <th class="field-name">Returns:</th>
+    <td class="field-body">
+        <ul class="first simple">
+          <li><p><code>pd.DataFrame</code> – dataframe with attributes</p></li>
+        </ul>
+    </td>
+    </tr>
+  </tbody>
+</table>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="src.podcast_recommendation.algorithm.PodcastRecommendation.gen_data_row" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">gen_data_row</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Helper for gen_data</p>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li><p><strong>row</strong> (<code>pd.Series</code>) – row of data</p></li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+    <th class="field-name">Returns:</th>
+    <td class="field-body">
+        <ul class="first simple">
+          <li><p><code>list</code> – list of attributes</p></li>
+        </ul>
+    </td>
+    </tr>
+  </tbody>
+</table>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="src.podcast_recommendation.algorithm.PodcastRecommendation.recommend" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">recommend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Generates podcast recommendation for user</p>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li><p><strong>user_id</strong> (<code>str</code>) – user id</p></li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+    <th class="field-name">Returns:</th>
+    <td class="field-body">
+        <ul class="first simple">
+          <li><p><code>pd.DataFrame</code> – podcasts and probabilities</p></li>
+        </ul>
+    </td>
+    </tr>
+  </tbody>
+</table>
+    </div>
+
+  </div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href=".." class="btn btn-neutral float-left" title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href=".." style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
