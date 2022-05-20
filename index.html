@@ -86,7 +86,7 @@
 </code></pre>
 <h3 id="crear-objeto">Crear objeto</h3>
 <p>Para utilizarlo debe tener una DataBase abierta en Neo4j con el plugin de Data Science
-<img alt="db" src="https://github.com/ManuelAlejandroMartinezFlores/PodcastRecommendation/blob/main/img/neo4j-db.png" /></p>
+<img alt="db" src="img/neo4j-db.png" /></p>
 <pre><code class="language-py">pr = PodcastRecommendation('bolt://localhost:7687', ('neo4j', 'password'), verbose=True)
 </code></pre>
 <pre><code>Reading x_train
@@ -104,7 +104,7 @@ Creating users, categories and ratings
 Build complete
 </code></pre>
 <p>Se genera un grafo como el siguiente:
-<img alt="grafo" src="https://github.com/ManuelAlejandroMartinezFlores/PodcastRecommendation/blob/main/img/neo4j-graph.png" /></p>
+<img alt="grafo" src="img/neo4j-graph.png" /></p>
 <h3 id="generar-recomendaciones">Generar recomendaciones</h3>
 <p>Para recomendar podcast al usuario <code>6C561484AED5C02</code></p>
 <pre><code class="language-py">pr.recommend(user_id='6C561484AED5C02')
@@ -227,5 +227,5 @@ Build complete
 
 <!--
 MkDocs version : 1.3.0
-Build Date UTC : 2022-05-20 00:14:18.554182+00:00
+Build Date UTC : 2022-05-20 00:20:25.972317+00:00
 -->
