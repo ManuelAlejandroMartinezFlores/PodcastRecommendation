@@ -1,7 +1,7 @@
 # PodcastRecommendation 
 ### ```0.1.6``` 
 Podcast Recommendation Algorithm <br>
-![Documentación completa](https://manuelalejandromartinezflores.github.io/PodcastRecommendation)
+[Documentación completa](https://manuelalejandromartinezflores.github.io/PodcastRecommendation)
 
 
 ## Instalar
