@@ -1,0 +1,15 @@
+site_name: PodcastRecommendation
+site_url: https://manuelalejandromartinezflores.github.io/PodcastRecommendation/
+
+theme:
+  name: readthedocs
+  nav_style: dark
+
+plugins:
+  - search
+  - mkdocstrings
+
+nav:
+    - Home: index.md
+    - Code Reference:
+        - Algorithm: algorithm-reference.md
