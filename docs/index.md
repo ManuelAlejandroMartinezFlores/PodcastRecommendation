@@ -1,37 +1,111 @@
-## Welcome to GitHub Pages
+# PodcastRecommendation 
+### ```0.1.4``` 
+Podcast Recommendation Algorithm
 
-You can use the [editor on GitHub](https://github.com/ManuelAlejandroMartinezFlores/PodcastRecommendation/edit/gh-pages/docs/index.md) to maintain and preview the content for your website in Markdown files.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+## Instalar
 
-### Markdown
+```
+python3 -m pip install podcast-recommendation
+```
+```
+pip install podcast-recommendation
+```
+```
+pip install podcast-recommendation==0.1.4
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
 ```
 
-For more details see [Basic writing and formatting syntax](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
+## Uso
+### Import
+```py
+from podcast_recommendation.algorithm import PodcastRecommendation
+```
 
-### Jekyll Themes
+### Crear objeto
+Para utilizarlo debe tener una DataBase abierta en Neo4j con el plugin de Data Science
+![db](https://github.com/ManuelAlejandroMartinezFlores/PodcastRecommendation/blob/main/img/neo4j-db.png)
+```py
+pr = PodcastRecommendation('bolt://localhost:7687', ('neo4j', 'password'), verbose=True)
+```
+```
+Reading x_train
+Reading y_train
+Training model
+Training complete
+```
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/ManuelAlejandroMartinezFlores/PodcastRecommendation/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+### Generar grafo
+```py
+pr.build_graph(verbose=True)
+```
+```
+Reading categories
+Reading ratings
+Creating categories, categories and IsA
+Creating users, categories and ratings
+Build complete
+```
 
-### Support or Contact
+Se genera un grafo como el siguiente:
+![grafo](https://github.com/ManuelAlejandroMartinezFlores/PodcastRecommendation/blob/main/img/neo4j-graph.png)
 
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+### Generar recomendaciones
+Para recomendar podcast al usuario ```6C561484AED5C02```
+```py
+pr.recommend(user_id='6C561484AED5C02')
+```
+```
+                          podcast_id     proba
+47  b4c3c3ebdd76e284f7d9fa358ac82030  0.999225
+31  c9add5e9e81a4b3ca963adab5b87083f  0.999216
+30  a37fb116709bfdb2dd58ea4f784cb815  0.999042
+42  a3a535f66c7e8004e7dc54c2b2829a9e  0.999038
+43  b70d658c901897359bb848cf876cbcbc  0.998779
+...
+```
+### Eliminar el grafo
+```py
+pr.delete_all()
+```
+
+### Eliminar rating
+Eliminar rating entre usuario ```6C561484AED5C02``` y podcast ```a3a535f66c7e8004e7dc54c2b2829a9e```
+```py
+pr.delete_rtg(user_id='6C561484AED5C02', podcast_id='a3a535f66c7e8004e7dc54c2b2829a9e')
+```
+
+### Crear rating
+Crear rating de 5 entre usuario ```6C561484AED5C02``` y podcast ```a3a535f66c7e8004e7dc54c2b2829a9e```
+```py
+pr.create_rtg(user_id='6C561484AED5C02', podcast_id='a3a535f66c7e8004e7dc54c2b2829a9e', rating=5)
+```
+
+### Crear usuario
+Crear usuario de id ```A1A1A1A1A1A1A1```
+```py
+pr.create_user(user_id='A1A1A1A1A1A1A1')
+```
+
+### Crear podcast
+Crear podcast de id ```a1a1a1a1a1a1a1a1a1a1a1```
+```py
+pr.create_podcast(podcast_id='a1a1a1a1a1a1a1a1a1a1a1')
+```
+
+### Crear categoria
+Crear categoria de nombre ```cat``` e id ```99``` 
+```py
+pr.create_category(category='cat', category_id=99)
+```
+
+### Crear relación IsA
+Crear relación podcast de id ```a1a1a1a1a1a1a1a1a1a1a1``` IsA categoria de nombre ```cat```
+```py
+pr.create_IsA(podcast_id='a1a1a1a1a1a1a1a1a1a1a1', category='cat')
+```
+
+### Cerrar driver
+```py
+pr.close()
+```
