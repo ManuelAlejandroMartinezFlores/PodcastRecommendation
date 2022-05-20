@@ -75,19 +75,33 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#src.podcast_recommendation.algorithm.PodcastRecommendation.create_user">create_user()</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#src.podcast_recommendation.algorithm.PodcastRecommendation.delete_IsA">delete_IsA()</a>
+    </li>
     <li class="toctree-l3"><a class="reference internal" href="#src.podcast_recommendation.algorithm.PodcastRecommendation.delete_all">delete_all()</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#src.podcast_recommendation.algorithm.PodcastRecommendation.delete_cat">delete_cat()</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#src.podcast_recommendation.algorithm.PodcastRecommendation.delete_podcast">delete_podcast()</a>
+    </li>
     <li class="toctree-l3"><a class="reference internal" href="#src.podcast_recommendation.algorithm.PodcastRecommendation.delete_rtg">delete_rtg()</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#src.podcast_recommendation.algorithm.PodcastRecommendation.delete_user">delete_user()</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#src.podcast_recommendation.algorithm.PodcastRecommendation.gen_data">gen_data()</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#src.podcast_recommendation.algorithm.PodcastRecommendation.gen_data_row">gen_data_row()</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#src.podcast_recommendation.algorithm.PodcastRecommendation.gen_df">gen_df()</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#src.podcast_recommendation.algorithm.PodcastRecommendation.gen_podcasts">gen_podcasts()</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#src.podcast_recommendation.algorithm.PodcastRecommendation.get_cat_based">get_cat_based()</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#src.podcast_recommendation.algorithm.PodcastRecommendation.get_user_based">get_user_based()</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#src.podcast_recommendation.algorithm.PodcastRecommendation.recommend">recommend()</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#src.podcast_recommendation.algorithm.PodcastRecommendation.resource_allocation">resource_allocation()</a>
     </li>
         </ul>
     </li>
@@ -581,6 +595,42 @@ PodcastRecommendation        </code>
 
 
 
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="src.podcast_recommendation.algorithm.PodcastRecommendation.delete_IsA" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">delete_IsA</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">,</span> <span class="n">category</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Deletes IsA relationship</p>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li><p><strong>podcast_id</strong> (<code>str</code>) – podcast id    </p></li>
+            <li><p><strong>category</strong> (<code>str</code>) – category name</p></li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+    </div>
+
+  </div>
+
+
 
   <div class="doc doc-object doc-method">
 
@@ -601,6 +651,76 @@ PodcastRecommendation        </code>
   </div>
 
 
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="src.podcast_recommendation.algorithm.PodcastRecommendation.delete_cat" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">delete_cat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Deletes category</p>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li><p><strong>category</strong> (<code>str</code>) – category name</p></li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="src.podcast_recommendation.algorithm.PodcastRecommendation.delete_podcast" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">delete_podcast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Deletes podcast</p>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li><p><strong>podcast_id</strong> (<code>str</code>) – podcast id</p></li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+    </div>
+
+  </div>
 
 
 
@@ -639,6 +759,41 @@ PodcastRecommendation        </code>
 
   </div>
 
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="src.podcast_recommendation.algorithm.PodcastRecommendation.delete_user" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">delete_user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Deletes user</p>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li><p><strong>user_id</strong> (<code>str</code>) – user id</p></li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+    </div>
+
+  </div>
 
 
 
@@ -745,6 +900,108 @@ PodcastRecommendation        </code>
   </div>
 
 
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="src.podcast_recommendation.algorithm.PodcastRecommendation.gen_df" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">gen_df</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Generates df with podcasts of interest</p>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li><p><strong>user_id</strong> (<code>str</code>) – user id</p></li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+    <th class="field-name">Returns:</th>
+    <td class="field-body">
+        <ul class="first simple">
+          <li><p><code>pd.DataFrame</code> – dataframe with podcasts</p></li>
+        </ul>
+    </td>
+    </tr>
+  </tbody>
+</table>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="src.podcast_recommendation.algorithm.PodcastRecommendation.gen_podcasts" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">gen_podcasts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Helper for gen_df. Uses paths (user)-[*3]-&gt;(podcast)</p>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li><p><strong>user_id</strong> (<code>str</code>) – user id</p></li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+    <th class="field-name">Returns:</th>
+    <td class="field-body">
+        <ul class="first simple">
+          <li><p><code>list</code> – list with podcasts</p></li>
+        </ul>
+    </td>
+    </tr>
+  </tbody>
+</table>
+    </div>
+
+  </div>
 
 
 
@@ -906,6 +1163,58 @@ PodcastRecommendation        </code>
 
   </div>
 
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="src.podcast_recommendation.algorithm.PodcastRecommendation.resource_allocation" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">resource_allocation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Generates data from resource allocation metric</p>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li><p><strong>user_id</strong> (<code>str</code>) – user id</p></li>
+            <li><p><strong>podcast_id</strong> (<code>str</code>) – podcast id</p></li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+    <th class="field-name">Returns:</th>
+    <td class="field-body">
+        <ul class="first simple">
+          <li><p><code>list</code> – resource allocation and count of paths</p></li>
+        </ul>
+    </td>
+    </tr>
+  </tbody>
+</table>
+    </div>
+
+  </div>
 
 
 
