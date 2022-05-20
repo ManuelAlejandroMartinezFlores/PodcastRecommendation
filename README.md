@@ -1,6 +1,7 @@
 # PodcastRecommendation 
-### ```0.1.4``` 
-Podcast Recommendation Algorithm
+### ```0.1.6``` 
+Podcast Recommendation Algorithm <br>
+![Documentación completa](https://manuelalejandromartinezflores.github.io/PodcastRecommendation)
 
 
 ## Instalar
@@ -12,7 +13,7 @@ python3 -m pip install podcast-recommendation
 pip install podcast-recommendation
 ```
 ```
-pip install podcast-recommendation==0.1.4
+pip install podcast-recommendation==0.1.6
 
 ```
 
