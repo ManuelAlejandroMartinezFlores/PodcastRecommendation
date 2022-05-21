@@ -1,5 +1,5 @@
 # PodcastRecommendation 
-### ```0.1.6``` 
+### ```0.1.8``` 
 Podcast Recommendation Algorithm
 
 
@@ -12,7 +12,7 @@ python3 -m pip install podcast-recommendation
 pip install podcast-recommendation
 ```
 ```
-pip install podcast-recommendation==0.1.6
+pip install podcast-recommendation==0.1.8
 
 ```
 
@@ -56,12 +56,13 @@ Para recomendar podcast al usuario ```6C561484AED5C02```
 pr.recommend(user_id='6C561484AED5C02')
 ```
 ```
-                          podcast_id     proba
-47  b4c3c3ebdd76e284f7d9fa358ac82030  0.999225
-31  c9add5e9e81a4b3ca963adab5b87083f  0.999216
-30  a37fb116709bfdb2dd58ea4f784cb815  0.999042
-42  a3a535f66c7e8004e7dc54c2b2829a9e  0.999038
-43  b70d658c901897359bb848cf876cbcbc  0.998779
+       proba                                              title
+47  0.999225                                Noah Kagan Presents
+31  0.999216                              The Model Health Show
+30  0.999042                       Mind Pump: Raw Fitness Truth
+42  0.999038                                      Jocko Podcast
+43  0.998779            The Learning Leader Show With Ryan Hawk
+32  0.998615                             Ben Greenfield Fitness
 ...
 ```
 ### Eliminar el grafo
@@ -88,9 +89,9 @@ pr.create_user(user_id='A1A1A1A1A1A1A1')
 ```
 
 ### Crear podcast
-Crear podcast de id ```a1a1a1a1a1a1a1a1a1a1a1```
+Crear podcast de id ```a1a1a1a1a1a1a1a1a1a1a1``` y título ```prueba```
 ```py
-pr.create_podcast(podcast_id='a1a1a1a1a1a1a1a1a1a1a1')
+pr.create_podcast(podcast_id='a1a1a1a1a1a1a1a1a1a1a1', title='prueba')
 ```
 
 ### Crear categoria
