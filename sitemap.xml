@@ -2,12 +2,17 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://manuelalejandromartinezflores.github.io/PodcastRecommendation/</loc>
-         <lastmod>2022-05-21</lastmod>
+         <lastmod>2022-05-25</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://manuelalejandromartinezflores.github.io/PodcastRecommendation/algorithm-reference/</loc>
-         <lastmod>2022-05-21</lastmod>
+         <lastmod>2022-05-25</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://manuelalejandromartinezflores.github.io/PodcastRecommendation/database/</loc>
+         <lastmod>2022-05-25</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>
