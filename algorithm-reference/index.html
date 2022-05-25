@@ -176,684 +176,6 @@ PodcastRecommendation        </code>
     <div class="doc doc-contents ">
 
 
-        <details class="quote">
-          <summary>Source code in <code>podcast_recommendation/algorithm.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">PodcastRecommendation</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">auth</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">x_path</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">y_path</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span><span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Creates object. Reads files to train Logistic Regression model.</span>
-
-
-<span class="sd">        Args:</span>
-<span class="sd">            uri (str): neo4j uri</span>
-<span class="sd">            auth (str): neo4j (user, psw)</span>
-<span class="sd">            x_path (str, optional): path to x_train. Defaults to X_PATH.</span>
-<span class="sd">            y_path (str, optional): path to y_train. Defaults to Y_PATH.</span>
-<span class="sd">            verbose (bool, optional): verbose. Defaults to False.</span>
-<span class="sd">        &quot;&quot;&quot;</span> 
-        <span class="k">if</span> <span class="n">x_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">x_path</span> <span class="o">=</span> <span class="n">X_PATH</span> 
-        <span class="k">if</span> <span class="n">y_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">y_path</span> <span class="o">=</span> <span class="n">Y_PATH</span>
-
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">driver</span> <span class="o">=</span> <span class="n">GD</span><span class="o">.</span><span class="n">driver</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">auth</span> <span class="o">=</span> <span class="n">auth</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">features</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cat_based&#39;</span><span class="p">,</span> <span class="s1">&#39;cat_cnt&#39;</span><span class="p">,</span> <span class="s1">&#39;user_based&#39;</span><span class="p">,</span> <span class="s1">&#39;user_cnt&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;adamic_adar&#39;</span><span class="p">,</span> <span class="s1">&#39;resource_allocation&#39;</span><span class="p">,</span> <span class="s1">&#39;link_cnt&#39;</span><span class="p">,</span> <span class="s1">&#39;cat_avg&#39;</span><span class="p">,</span> <span class="s1">&#39;user_avg&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;adar_avg&#39;</span><span class="p">,</span> <span class="s1">&#39;ra_avg&#39;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">lr</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">solver</span><span class="o">=</span><span class="s1">&#39;liblinear&#39;</span><span class="p">,</span> <span class="n">C</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reading x_train&quot;</span><span class="p">)</span>
-        <span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">x_path</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reading y_train&quot;</span><span class="p">)</span>
-        <span class="n">Y</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">y_path</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Training model&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">lr</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">],</span> <span class="n">Y</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Training complete&quot;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reading podcasts&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pod</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">POD_PATH</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">build_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cat_path</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">rtg_path</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">delete_all</span><span class="p">:</span><span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-                    <span class="n">verbose</span><span class="p">:</span><span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Builds graph in neo4j</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            cat_path (str, optional): path to categories_sample. Defaults to CAT_PATH.</span>
-<span class="sd">            rtg_path (str, optional): path to ratings_sample. Defaults to RTG_PATH.</span>
-<span class="sd">            delete_all (bool, optional): if to delete graph before writting. Defaults to True.</span>
-<span class="sd">            verbose (bool, optional): verbose. Defaults to False.</span>
-<span class="sd">        &quot;&quot;&quot;</span> 
-        <span class="k">if</span> <span class="n">cat_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">cat_path</span> <span class="o">=</span> <span class="n">CAT_PATH</span>
-        <span class="k">if</span> <span class="n">rtg_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">rtg_path</span> <span class="o">=</span> <span class="n">RTG_PATH</span>
-
-        <span class="k">if</span> <span class="n">delete_all</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Deleting all nodes and relationships&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">delete_all</span><span class="p">()</span>
-
-        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reading categories&quot;</span><span class="p">)</span>
-        <span class="n">cat</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">cat_path</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reading ratings&quot;</span><span class="p">)</span>
-        <span class="n">rtg</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">rtg_path</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Creating podcasts, categories and IsA&quot;</span><span class="p">)</span>
-        <span class="n">cat</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">build_cat</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Creating users, categories and ratings&quot;</span><span class="p">)</span>
-        <span class="n">rtg</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">build_rtg</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Build complete&quot;</span><span class="p">)</span>
-
-
-    <span class="k">def</span> <span class="nf">build_cat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">:</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Builds relations in categories_sample dataset</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            row (pd.Series): dataframe row</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
-            <span class="n">sess</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__build_cat</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;category&#39;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;category_id&#39;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;podcast_id&#39;</span><span class="p">])</span>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">__build_cat</span><span class="p">(</span><span class="n">tx</span><span class="p">,</span> <span class="n">category</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">category_id</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Helper for build_cat</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            tx (_type_): transaction</span>
-<span class="sd">            category (str): category name</span>
-<span class="sd">            category_id (str): category id</span>
-<span class="sd">            podcast_id (str): podcast id</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">query</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s2">&quot;MERGE (p:Podcast{id: $podcast_id}) &quot;</span>
-            <span class="s2">&quot;MERGE (c:Category{id: toInteger($category_id), name: $category}) &quot;</span>
-            <span class="s2">&quot;MERGE (p)-[r:IsA]-&gt;(c) &quot;</span>
-        <span class="p">)</span>
-        <span class="n">tx</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">podcast_id</span><span class="o">=</span><span class="n">podcast_id</span><span class="p">,</span> <span class="n">category_id</span><span class="o">=</span><span class="n">category_id</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="n">category</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">build_rtg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">:</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Builds relations in ratings_sample dataset</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            row (pd.Series): dataframe row</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
-            <span class="n">sess</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__build_rtg</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;user_id&#39;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;podcast_id&#39;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;rating&#39;</span><span class="p">])</span>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">__build_rtg</span><span class="p">(</span><span class="n">tx</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">rating</span><span class="p">:</span><span class="nb">int</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Helper for build_rtg</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            tx (_type_): transaction</span>
-<span class="sd">            user_id (str): user id</span>
-<span class="sd">            podcast_id (str): podcast id</span>
-<span class="sd">            rating (int): rating</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">query</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s2">&quot;MERGE (u:User{id: $user_id}) &quot;</span>
-            <span class="s2">&quot;MERGE (p:Podcast{id: $podcast_id}) &quot;</span>
-            <span class="s2">&quot;MERGE (u)-[r:Rating{rating: toInteger($rating)}]-&gt;(p) &quot;</span>
-        <span class="p">)</span>
-        <span class="n">tx</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">,</span> <span class="n">podcast_id</span><span class="o">=</span><span class="n">podcast_id</span><span class="p">,</span> <span class="n">rating</span><span class="o">=</span><span class="n">rating</span><span class="p">)</span>
-
-
-    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Closes driver.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-
-    <span class="k">def</span> <span class="nf">delete_all</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Deletes all elements in the graph</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
-            <span class="n">sess</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__delete_all</span><span class="p">)</span>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">__delete_all</span><span class="p">(</span><span class="n">tx</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Helper for delete all</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            tx (_type_): transaction</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;MATCH (m)-[r]-&gt;(n) DELETE m, n, r&quot;</span>
-        <span class="n">tx</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">recommend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Generates podcast recommendation for user</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            user_id (str): user id</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            pd.DataFrame: podcasts and probabilities</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gen_df</span><span class="p">(</span><span class="n">user_id</span><span class="p">)</span>
-
-        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gen_data</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;proba&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lr</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">])[:,</span><span class="mi">1</span><span class="p">]</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s1">&#39;proba&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-        <span class="n">pod</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pod</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;podcast_id&#39;</span><span class="p">)</span>
-        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;podcast_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">pod</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">])</span>
-
-        <span class="k">return</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;proba&#39;</span><span class="p">,</span> <span class="s1">&#39;title&#39;</span><span class="p">]]</span>
-
-    <span class="k">def</span> <span class="nf">gen_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Generates data for podcast recommendation</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            df (pd.DataFrame): podcasts</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            pd.DataFrame: dataframe with attributes</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">c_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cat_based&#39;</span><span class="p">,</span> <span class="s1">&#39;cat_cnt&#39;</span><span class="p">,</span> <span class="s1">&#39;user_based&#39;</span><span class="p">,</span> <span class="s1">&#39;user_cnt&#39;</span><span class="p">,</span>
-                   <span class="s1">&#39;adamic_adar&#39;</span><span class="p">,</span> <span class="s1">&#39;resource_allocation&#39;</span><span class="p">,</span> <span class="s1">&#39;link_cnt&#39;</span><span class="p">]</span>
-        <span class="n">df</span><span class="p">[</span><span class="n">c_names</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gen_data_row</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">result_type</span><span class="o">=</span><span class="s1">&#39;expand&#39;</span><span class="p">)</span>
-        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;cat_avg&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;cat_based&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;cat_cnt&#39;</span><span class="p">]</span>
-        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;user_avg&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;user_based&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;user_cnt&#39;</span><span class="p">]</span>
-        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;adar_avg&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;adamic_adar&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;link_cnt&#39;</span><span class="p">]</span>
-        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;ra_avg&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;resource_allocation&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;link_cnt&#39;</span><span class="p">]</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">df</span> 
-
-    <span class="k">def</span> <span class="nf">gen_data_row</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">:</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">list</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Helper for gen_data</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            row (pd.Series): row of data</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            list: list of attributes</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">u_id</span><span class="p">,</span> <span class="n">p_id</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;user_id&#39;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;podcast_id&#39;</span><span class="p">]</span>
-
-        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cat_based</span><span class="p">(</span><span class="n">u_id</span><span class="p">,</span> <span class="n">p_id</span><span class="p">)</span>
-        <span class="n">result</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_user_based</span><span class="p">(</span><span class="n">u_id</span><span class="p">,</span> <span class="n">p_id</span><span class="p">)</span>
-        <span class="n">result</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">adamic_adar</span><span class="p">(</span><span class="n">u_id</span><span class="p">,</span> <span class="n">p_id</span><span class="p">)</span>
-        <span class="n">result</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource_allocation</span><span class="p">(</span><span class="n">u_id</span><span class="p">,</span> <span class="n">p_id</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">result</span>
-
-    <span class="k">def</span> <span class="nf">delete_rtg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Deletes rating relationship</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            user_id (str): user id</span>
-<span class="sd">            podcast_id (str): podcast id</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
-            <span class="n">sess</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__delete_rtg</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">)</span>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">__delete_rtg</span><span class="p">(</span><span class="n">tx</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Helper for delete_rtg</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            tx (_type_): transaction</span>
-<span class="sd">            user_id (str): user id</span>
-<span class="sd">            podcast_id (str): podcast id</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">query</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s2">&quot;MATCH (u:User)-[r]-&gt;(p:Podcast) &quot;</span>
-            <span class="s2">&quot;WHERE u.id = $user_id AND p.id = $podcast_id &quot;</span>
-            <span class="s2">&quot;DELETE r&quot;</span>
-        <span class="p">)</span>
-        <span class="n">tx</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">,</span> <span class="n">podcast_id</span><span class="o">=</span><span class="n">podcast_id</span><span class="p">)</span>
-
-
-    <span class="k">def</span> <span class="nf">create_rtg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">rating</span><span class="p">:</span><span class="nb">int</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Create rating relationship</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            user_id (str): user id</span>
-<span class="sd">            podcast_id (str): podcast id</span>
-<span class="sd">            rating (int): rating</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
-            <span class="n">sess</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__create_rtg</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">,</span> <span class="n">rating</span><span class="p">)</span>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">__create_rtg</span><span class="p">(</span><span class="n">tx</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">rating</span><span class="p">:</span><span class="nb">int</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Helper for create_rtg</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            tx (_type_): transaction</span>
-<span class="sd">            user_id (str): user id</span>
-<span class="sd">            podcast_id (str): podcast id</span>
-<span class="sd">            rating (int): rating</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">query</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s2">&quot;MATCH (u:User) MATCH (p:Podcast) &quot;</span>
-            <span class="s2">&quot;WHERE u.id = $user_id AND p.id = $podcast_id &quot;</span>
-            <span class="s2">&quot;MERGE (u)-[r:Rating{rating:toInteger($rating)}]-&gt;(p) &quot;</span>
-        <span class="p">)</span>
-        <span class="n">tx</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">,</span> <span class="n">podcast_id</span><span class="o">=</span><span class="n">podcast_id</span><span class="p">,</span> <span class="n">rating</span><span class="o">=</span><span class="n">rating</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">create_user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Creates user</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            user_id (str): user id</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
-            <span class="n">sess</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__create_user</span><span class="p">,</span> <span class="n">user_id</span><span class="p">)</span>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">__create_user</span><span class="p">(</span><span class="n">tx</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Helper for create_user</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            tx (_type_): transaction</span>
-<span class="sd">            user_id (str): user id</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">query</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s2">&quot;MERGE (u:User{id:$user_id}) &quot;</span>
-        <span class="p">)</span>
-        <span class="n">tx</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">create_podcast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Creates a podcast</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            podcast_id (str): podcast id</span>
-<span class="sd">            title (str): title</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pod</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pod</span><span class="p">)]</span> <span class="o">=</span> <span class="p">[</span><span class="n">podcast_id</span><span class="p">,</span> <span class="n">title</span><span class="p">]</span>
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
-            <span class="n">sess</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__create_podcast</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">)</span>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">__create_podcast</span><span class="p">(</span><span class="n">tx</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Helper for create_podcast</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            tx (_type_): transaction</span>
-<span class="sd">            podcast_id (str): podcast id</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">query</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s2">&quot;MERGE (u:Podcast{id:$podcast_id}) &quot;</span>
-        <span class="p">)</span>
-        <span class="n">tx</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">podcast_id</span><span class="o">=</span><span class="n">podcast_id</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">create_category</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">category_id</span><span class="p">:</span><span class="nb">int</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Creates category</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            category (str): category name</span>
-<span class="sd">            category_id (int): category id</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
-            <span class="n">sess</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__create_category</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="n">category_id</span><span class="p">)</span>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">__create_category</span><span class="p">(</span><span class="n">tx</span><span class="p">,</span> <span class="n">category</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">category_id</span><span class="p">:</span><span class="nb">int</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Helper for create_category</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            tx (_type_): transaction</span>
-<span class="sd">            category (str): category name</span>
-<span class="sd">            category_id (int): category id</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">query</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s2">&quot;MERGE (u:Podcast{id:$category_id, name:$category}) &quot;</span>
-        <span class="p">)</span>
-        <span class="n">tx</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">category_id</span><span class="o">=</span><span class="n">category_id</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="n">category</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">create_IsA</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">category</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Creates an IsA relationship</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            podcast_id (str): podcast id</span>
-<span class="sd">            category (str): category name</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
-            <span class="n">sess</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__create_IsA</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">,</span> <span class="n">category</span><span class="p">)</span>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">__create_IsA</span><span class="p">(</span><span class="n">tx</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">category</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Helper for create_IsA</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            tx (_type_): transaction</span>
-<span class="sd">            podcast_id (str): podcast id</span>
-<span class="sd">            category (str): category name</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">query</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s2">&quot;MATCH (c:Category) MATCH (p:Podcast) &quot;</span>
-            <span class="s2">&quot;WHERE c.name = $category AND p.id = $podcast_id &quot;</span>
-            <span class="s2">&quot;MERGE (p)-[r:IsA]-&gt;(c) &quot;</span>
-        <span class="p">)</span>
-        <span class="n">tx</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="n">category</span><span class="p">,</span> <span class="n">podcast_id</span><span class="o">=</span><span class="n">podcast_id</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">get_cat_based</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">list</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Generates data from paths</span>
-<span class="sd">        (user)-&gt;(podcast)-&gt;(category)&lt;-(podcast)</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            user_id (str): user id</span>
-<span class="sd">            podcast_id (str): podcast id</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            list: sum of ratings and count of paths</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
-            <span class="n">result</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__get_cat_based</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">result</span>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">__get_cat_based</span><span class="p">(</span><span class="n">tx</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">list</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Helper for get_cat_based</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            tx (_type_): transaction</span>
-<span class="sd">            user_id (str): user id</span>
-<span class="sd">            podcast_id (str): podcast id</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            list: sum of ratings and count of paths</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">query</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s2">&quot;MATCH (u:User)-[r]-&gt;(Podcast)--&gt;(Category)&lt;--(p:Podcast) &quot;</span>
-            <span class="s2">&quot;WHERE u.id = $user_id AND p.id = $podcast_id &quot;</span>
-            <span class="s2">&quot;RETURN r&quot;</span>
-        <span class="p">)</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">tx</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">,</span> <span class="n">podcast_id</span><span class="o">=</span><span class="n">podcast_id</span><span class="p">)</span>
-        <span class="n">total</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">cnt</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
-            <span class="n">total</span> <span class="o">+=</span> <span class="n">rec</span><span class="p">[</span><span class="s1">&#39;r&#39;</span><span class="p">][</span><span class="s1">&#39;rating&#39;</span><span class="p">]</span>
-            <span class="n">cnt</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">total</span><span class="p">,</span> <span class="n">cnt</span><span class="p">]</span>
-
-    <span class="k">def</span> <span class="nf">get_user_based</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">list</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Generates data from paths</span>
-<span class="sd">        (user)-&gt;(podcast)&lt;-(user)-&gt;(podcast)</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            user_id (str): user id</span>
-<span class="sd">            podcast_id (str): podcast id</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            list: sum of ratings and count of paths</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
-            <span class="n">result</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__get_user_based</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">result</span>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">__get_user_based</span><span class="p">(</span><span class="n">tx</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">list</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Helper for get_user_based</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            tx (_type_): transaction</span>
-<span class="sd">            user_id (str): user id</span>
-<span class="sd">            podcast_id (str): podcast id</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            list: sum of ratings and count of paths</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">query</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s2">&quot;MATCH (u:User)-[r1]-&gt;(Podcast)&lt;-[r2]-&gt;(User)-[r3]-&gt;(p:Podcast) &quot;</span>
-            <span class="s2">&quot;WHERE u.id = $user_id AND p.id = $podcast_id &quot;</span>
-            <span class="s2">&quot;RETURN r1.rating + r2.rating + r3.rating &quot;</span>
-            <span class="s2">&quot;AS total&quot;</span>
-        <span class="p">)</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">tx</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">,</span> <span class="n">podcast_id</span><span class="o">=</span><span class="n">podcast_id</span><span class="p">)</span>
-        <span class="n">total</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">cnt</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
-            <span class="n">total</span> <span class="o">+=</span> <span class="n">rec</span><span class="p">[</span><span class="s1">&#39;total&#39;</span><span class="p">]</span>
-            <span class="n">cnt</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">total</span><span class="p">,</span> <span class="n">cnt</span><span class="p">]</span>
-
-    <span class="k">def</span> <span class="nf">adamic_adar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">list</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Generates data from Adamic Adar metric</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            user_id (str): user id</span>
-<span class="sd">            podcast_id (str): podcast id</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            list: adamic adar</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
-            <span class="n">result</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__adamic_adar</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">result</span>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">__adamic_adar</span><span class="p">(</span><span class="n">tx</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">list</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Helper for adamic_adar</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            tx (_type_): transaction</span>
-<span class="sd">            user_id (str): user id</span>
-<span class="sd">            podcast_id (str): podcast id</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            list: adamic adar</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">query</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s2">&quot;MATCH (u:User)-[r]-&gt;(p1:Podcast) MATCH (p:Podcast)&quot;</span>
-            <span class="s2">&quot;WHERE u.id = $user_id AND p.id = $podcast_id &quot;</span>
-            <span class="s2">&quot;RETURN r.rating * gds.alpha.linkprediction.adamicAdar(p1, p) &quot;</span>
-            <span class="s2">&quot;AS score &quot;</span>
-        <span class="p">)</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">tx</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">,</span> <span class="n">podcast_id</span><span class="o">=</span><span class="n">podcast_id</span><span class="p">)</span>
-        <span class="n">total</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
-            <span class="n">total</span> <span class="o">+=</span> <span class="n">rec</span><span class="p">[</span><span class="s1">&#39;score&#39;</span><span class="p">]</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">total</span><span class="p">]</span>
-
-    <span class="k">def</span> <span class="nf">resource_allocation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">list</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Generates data from resource allocation metric</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            user_id (str): user id</span>
-<span class="sd">            podcast_id (str): podcast id</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            list: resource allocation and count of paths</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
-            <span class="n">result</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__resource_allocation</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">result</span>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">__resource_allocation</span><span class="p">(</span><span class="n">tx</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">list</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Helper for resource_allocation</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            tx (_type_): transaction</span>
-<span class="sd">            user_id (str): user id</span>
-<span class="sd">            podcast_id (str): podcast id</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            list: resource allocation and count of paths</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">query</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s2">&quot;MATCH (u:User)-[r]-&gt;(p1:Podcast) MATCH (p:Podcast)&quot;</span>
-            <span class="s2">&quot;WHERE u.id = $user_id AND p.id = $podcast_id &quot;</span>
-            <span class="s2">&quot;RETURN r.rating * gds.alpha.linkprediction.resourceAllocation(p1, p) &quot;</span>
-            <span class="s2">&quot;AS score &quot;</span>
-        <span class="p">)</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">tx</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">,</span> <span class="n">podcast_id</span><span class="o">=</span><span class="n">podcast_id</span><span class="p">)</span>
-        <span class="n">total</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">cnt</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
-            <span class="n">total</span> <span class="o">+=</span> <span class="n">rec</span><span class="p">[</span><span class="s1">&#39;score&#39;</span><span class="p">]</span>
-            <span class="n">cnt</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">total</span><span class="p">,</span> <span class="n">cnt</span><span class="p">]</span>
-
-    <span class="k">def</span> <span class="nf">gen_df</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Generates df with podcasts of interest</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            user_id (str): user id</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            pd.DataFrame: dataframe with podcasts</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">podcasts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gen_podcasts</span><span class="p">(</span><span class="n">user_id</span><span class="p">)</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;podcast_id&#39;</span><span class="p">:</span><span class="n">podcasts</span><span class="p">})</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">pod</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pod</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-            <span class="n">df</span> <span class="o">=</span> <span class="n">pod</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">pod</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mf">0.2</span><span class="p">]</span>
-            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;podcast_id&#39;</span><span class="p">]</span>
-            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="mi">50</span><span class="p">,:]</span>
-        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;user_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">user_id</span>
-        <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="mi">50</span><span class="p">,</span> <span class="mi">1</span><span class="p">:]</span>
-
-    <span class="k">def</span> <span class="nf">gen_podcasts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">list</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Helper for gen_df. Uses paths (user)-[*3]-&gt;(podcast)</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            user_id (str): user id</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            list: list with podcasts</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
-            <span class="n">result</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__gen_podcasts</span><span class="p">,</span> <span class="n">user_id</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">result</span>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">__gen_podcasts</span><span class="p">(</span><span class="n">tx</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">list</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Helper for gen_podcasts</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            tx (): transaction</span>
-<span class="sd">            user_id (str): user id</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            list: podcasts</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">query</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s2">&quot;MATCH (u:User)-[*3]-(p:Podcast) &quot;</span>
-            <span class="s2">&quot;WHERE u.id = $user_id &quot;</span>
-            <span class="s2">&quot;RETURN p.id AS p_id &quot;</span>
-        <span class="p">)</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">tx</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">)</span>
-        <span class="n">ans</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
-            <span class="n">ans</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rec</span><span class="p">[</span><span class="s1">&#39;p_id&#39;</span><span class="p">])</span>
-        <span class="k">return</span> <span class="n">ans</span>
-
-    <span class="k">def</span> <span class="nf">delete_user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Deletes user</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            user_id (str): user id</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
-             <span class="n">sess</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__delete_user</span><span class="p">,</span> <span class="n">user_id</span><span class="p">)</span>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">__delete_user</span><span class="p">(</span><span class="n">tx</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Helper for delete_user</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            tx (_type_): transaction</span>
-<span class="sd">            user_id (str): user id</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">query</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s2">&quot;MATCH (u:User)-[r]-&gt;() WHERE u.id = $user_id &quot;</span>
-            <span class="s2">&quot;DELETE r, u &quot;</span>
-        <span class="p">)</span>
-        <span class="n">tx</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">delete_podcast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Deletes podcast</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            podcast_id (str): podcast id</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
-             <span class="n">sess</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__delete_podcast</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">)</span>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">__delete_podcast</span><span class="p">(</span><span class="n">tx</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Helper for delete_podcast</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            tx (_type_): transaction</span>
-<span class="sd">            podcast_id (str): podcast id</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">query</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s2">&quot;MATCH (p:Podcast)-[r]-() WHERE p.id = $podcast_id &quot;</span>
-            <span class="s2">&quot;DELETE r, p &quot;</span>
-        <span class="p">)</span>
-        <span class="n">tx</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">podcast_id</span><span class="o">=</span><span class="n">podcast_id</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">delete_cat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Deletes category</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            category (str): category name</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
-             <span class="n">sess</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__delete_cat</span><span class="p">,</span> <span class="n">category</span><span class="p">)</span>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">__delete_cat</span><span class="p">(</span><span class="n">tx</span><span class="p">,</span> <span class="n">category</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Helper for delete_cat</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            tx (_type_): transaction</span>
-<span class="sd">            category (str): category name</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">query</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s2">&quot;MATCH (c:Category)&lt;-[r]-() WHERE c.name = $category &quot;</span>
-            <span class="s2">&quot;DELETE r, c &quot;</span>
-        <span class="p">)</span>
-        <span class="n">tx</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="n">category</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">delete_IsA</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">category</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Deletes IsA relationship</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            podcast_id (str): podcast id    </span>
-<span class="sd">            category (str): category name</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
-            <span class="n">sess</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__delete_IsA</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">,</span> <span class="n">category</span><span class="p">)</span>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">__delete_IsA</span><span class="p">(</span><span class="n">tx</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">category</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Helper for delete_IsA</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            tx (_type_): transaction</span>
-<span class="sd">            podcast_id (str): podcast id</span>
-<span class="sd">            category (str): category name</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">query</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s2">&quot;MATCH (p:Podcast)-[r]-&gt;(c:Category) &quot;</span>
-            <span class="s2">&quot;WHERE p.id = $podcast_id AND c.name = $category &quot;</span>
-            <span class="s2">&quot;DELETE r&quot;</span>
-        <span class="p">)</span>
-        <span class="n">tx</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">podcast_id</span><span class="o">=</span><span class="n">podcast_id</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="n">category</span><span class="p">)</span>
-</code></pre></div>
-        </details>
 
 
 
@@ -904,42 +226,6 @@ PodcastRecommendation        </code>
     </tr>
   </tbody>
 </table>
-        <details class="quote">
-          <summary>Source code in <code>podcast_recommendation/algorithm.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">auth</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">x_path</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">y_path</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span><span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Creates object. Reads files to train Logistic Regression model.</span>
-
-
-<span class="sd">    Args:</span>
-<span class="sd">        uri (str): neo4j uri</span>
-<span class="sd">        auth (str): neo4j (user, psw)</span>
-<span class="sd">        x_path (str, optional): path to x_train. Defaults to X_PATH.</span>
-<span class="sd">        y_path (str, optional): path to y_train. Defaults to Y_PATH.</span>
-<span class="sd">        verbose (bool, optional): verbose. Defaults to False.</span>
-<span class="sd">    &quot;&quot;&quot;</span> 
-    <span class="k">if</span> <span class="n">x_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">x_path</span> <span class="o">=</span> <span class="n">X_PATH</span> 
-    <span class="k">if</span> <span class="n">y_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">y_path</span> <span class="o">=</span> <span class="n">Y_PATH</span>
-
-
-    <span class="bp">self</span><span class="o">.</span><span class="n">driver</span> <span class="o">=</span> <span class="n">GD</span><span class="o">.</span><span class="n">driver</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">auth</span> <span class="o">=</span> <span class="n">auth</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">features</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cat_based&#39;</span><span class="p">,</span> <span class="s1">&#39;cat_cnt&#39;</span><span class="p">,</span> <span class="s1">&#39;user_based&#39;</span><span class="p">,</span> <span class="s1">&#39;user_cnt&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;adamic_adar&#39;</span><span class="p">,</span> <span class="s1">&#39;resource_allocation&#39;</span><span class="p">,</span> <span class="s1">&#39;link_cnt&#39;</span><span class="p">,</span> <span class="s1">&#39;cat_avg&#39;</span><span class="p">,</span> <span class="s1">&#39;user_avg&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;adar_avg&#39;</span><span class="p">,</span> <span class="s1">&#39;ra_avg&#39;</span><span class="p">]</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">lr</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">solver</span><span class="o">=</span><span class="s1">&#39;liblinear&#39;</span><span class="p">,</span> <span class="n">C</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reading x_train&quot;</span><span class="p">)</span>
-    <span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">x_path</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reading y_train&quot;</span><span class="p">)</span>
-    <span class="n">Y</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">y_path</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Training model&quot;</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">lr</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">],</span> <span class="n">Y</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
-    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Training complete&quot;</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reading podcasts&quot;</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">pod</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">POD_PATH</span><span class="p">)</span>
-</code></pre></div>
-        </details>
     </div>
 
   </div>
@@ -993,24 +279,6 @@ PodcastRecommendation        </code>
     </tr>
   </tbody>
 </table>
-        <details class="quote">
-          <summary>Source code in <code>podcast_recommendation/algorithm.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">adamic_adar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">list</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Generates data from Adamic Adar metric</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        user_id (str): user id</span>
-<span class="sd">        podcast_id (str): podcast id</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        list: adamic adar</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__adamic_adar</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">result</span>
-</code></pre></div>
-        </details>
     </div>
 
   </div>
@@ -1047,19 +315,6 @@ PodcastRecommendation        </code>
     </tr>
   </tbody>
 </table>
-        <details class="quote">
-          <summary>Source code in <code>podcast_recommendation/algorithm.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">build_cat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">:</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Builds relations in categories_sample dataset</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        row (pd.Series): dataframe row</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
-        <span class="n">sess</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__build_cat</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;category&#39;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;category_id&#39;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;podcast_id&#39;</span><span class="p">])</span>
-</code></pre></div>
-        </details>
     </div>
 
   </div>
@@ -1099,41 +354,6 @@ PodcastRecommendation        </code>
     </tr>
   </tbody>
 </table>
-        <details class="quote">
-          <summary>Source code in <code>podcast_recommendation/algorithm.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">build_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cat_path</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">rtg_path</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">delete_all</span><span class="p">:</span><span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-                <span class="n">verbose</span><span class="p">:</span><span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Builds graph in neo4j</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        cat_path (str, optional): path to categories_sample. Defaults to CAT_PATH.</span>
-<span class="sd">        rtg_path (str, optional): path to ratings_sample. Defaults to RTG_PATH.</span>
-<span class="sd">        delete_all (bool, optional): if to delete graph before writting. Defaults to True.</span>
-<span class="sd">        verbose (bool, optional): verbose. Defaults to False.</span>
-<span class="sd">    &quot;&quot;&quot;</span> 
-    <span class="k">if</span> <span class="n">cat_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">cat_path</span> <span class="o">=</span> <span class="n">CAT_PATH</span>
-    <span class="k">if</span> <span class="n">rtg_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">rtg_path</span> <span class="o">=</span> <span class="n">RTG_PATH</span>
-
-    <span class="k">if</span> <span class="n">delete_all</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Deleting all nodes and relationships&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">delete_all</span><span class="p">()</span>
-
-    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reading categories&quot;</span><span class="p">)</span>
-    <span class="n">cat</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">cat_path</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reading ratings&quot;</span><span class="p">)</span>
-    <span class="n">rtg</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">rtg_path</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Creating podcasts, categories and IsA&quot;</span><span class="p">)</span>
-    <span class="n">cat</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">build_cat</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Creating users, categories and ratings&quot;</span><span class="p">)</span>
-    <span class="n">rtg</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">build_rtg</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Build complete&quot;</span><span class="p">)</span>
-</code></pre></div>
-        </details>
     </div>
 
   </div>
@@ -1170,19 +390,6 @@ PodcastRecommendation        </code>
     </tr>
   </tbody>
 </table>
-        <details class="quote">
-          <summary>Source code in <code>podcast_recommendation/algorithm.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">build_rtg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">:</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Builds relations in ratings_sample dataset</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        row (pd.Series): dataframe row</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
-        <span class="n">sess</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__build_rtg</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;user_id&#39;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;podcast_id&#39;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;rating&#39;</span><span class="p">])</span>
-</code></pre></div>
-        </details>
     </div>
 
   </div>
@@ -1203,14 +410,6 @@ PodcastRecommendation        </code>
 
       <p>Closes driver.</p>
 
-        <details class="quote">
-          <summary>Source code in <code>podcast_recommendation/algorithm.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Closes driver.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-</code></pre></div>
-        </details>
     </div>
 
   </div>
@@ -1248,20 +447,6 @@ PodcastRecommendation        </code>
     </tr>
   </tbody>
 </table>
-        <details class="quote">
-          <summary>Source code in <code>podcast_recommendation/algorithm.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">create_IsA</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">category</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Creates an IsA relationship</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        podcast_id (str): podcast id</span>
-<span class="sd">        category (str): category name</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
-        <span class="n">sess</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__create_IsA</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">,</span> <span class="n">category</span><span class="p">)</span>
-</code></pre></div>
-        </details>
     </div>
 
   </div>
@@ -1299,20 +484,6 @@ PodcastRecommendation        </code>
     </tr>
   </tbody>
 </table>
-        <details class="quote">
-          <summary>Source code in <code>podcast_recommendation/algorithm.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">create_category</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">category_id</span><span class="p">:</span><span class="nb">int</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Creates category</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        category (str): category name</span>
-<span class="sd">        category_id (int): category id</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
-        <span class="n">sess</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__create_category</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="n">category_id</span><span class="p">)</span>
-</code></pre></div>
-        </details>
     </div>
 
   </div>
@@ -1350,21 +521,6 @@ PodcastRecommendation        </code>
     </tr>
   </tbody>
 </table>
-        <details class="quote">
-          <summary>Source code in <code>podcast_recommendation/algorithm.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">create_podcast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Creates a podcast</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        podcast_id (str): podcast id</span>
-<span class="sd">        title (str): title</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">pod</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pod</span><span class="p">)]</span> <span class="o">=</span> <span class="p">[</span><span class="n">podcast_id</span><span class="p">,</span> <span class="n">title</span><span class="p">]</span>
-    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
-        <span class="n">sess</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__create_podcast</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">)</span>
-</code></pre></div>
-        </details>
     </div>
 
   </div>
@@ -1403,21 +559,6 @@ PodcastRecommendation        </code>
     </tr>
   </tbody>
 </table>
-        <details class="quote">
-          <summary>Source code in <code>podcast_recommendation/algorithm.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">create_rtg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">rating</span><span class="p">:</span><span class="nb">int</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Create rating relationship</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        user_id (str): user id</span>
-<span class="sd">        podcast_id (str): podcast id</span>
-<span class="sd">        rating (int): rating</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
-        <span class="n">sess</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__create_rtg</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">,</span> <span class="n">rating</span><span class="p">)</span>
-</code></pre></div>
-        </details>
     </div>
 
   </div>
@@ -1454,19 +595,6 @@ PodcastRecommendation        </code>
     </tr>
   </tbody>
 </table>
-        <details class="quote">
-          <summary>Source code in <code>podcast_recommendation/algorithm.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">create_user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Creates user</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        user_id (str): user id</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
-        <span class="n">sess</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__create_user</span><span class="p">,</span> <span class="n">user_id</span><span class="p">)</span>
-</code></pre></div>
-        </details>
     </div>
 
   </div>
@@ -1504,20 +632,6 @@ PodcastRecommendation        </code>
     </tr>
   </tbody>
 </table>
-        <details class="quote">
-          <summary>Source code in <code>podcast_recommendation/algorithm.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">delete_IsA</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">category</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Deletes IsA relationship</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        podcast_id (str): podcast id    </span>
-<span class="sd">        category (str): category name</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
-        <span class="n">sess</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__delete_IsA</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">,</span> <span class="n">category</span><span class="p">)</span>
-</code></pre></div>
-        </details>
     </div>
 
   </div>
@@ -1538,16 +652,6 @@ PodcastRecommendation        </code>
 
       <p>Deletes all elements in the graph</p>
 
-        <details class="quote">
-          <summary>Source code in <code>podcast_recommendation/algorithm.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">delete_all</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Deletes all elements in the graph</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
-        <span class="n">sess</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__delete_all</span><span class="p">)</span>
-</code></pre></div>
-        </details>
     </div>
 
   </div>
@@ -1584,19 +688,6 @@ PodcastRecommendation        </code>
     </tr>
   </tbody>
 </table>
-        <details class="quote">
-          <summary>Source code in <code>podcast_recommendation/algorithm.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">delete_cat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Deletes category</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        category (str): category name</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
-         <span class="n">sess</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__delete_cat</span><span class="p">,</span> <span class="n">category</span><span class="p">)</span>
-</code></pre></div>
-        </details>
     </div>
 
   </div>
@@ -1633,19 +724,6 @@ PodcastRecommendation        </code>
     </tr>
   </tbody>
 </table>
-        <details class="quote">
-          <summary>Source code in <code>podcast_recommendation/algorithm.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">delete_podcast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Deletes podcast</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        podcast_id (str): podcast id</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
-         <span class="n">sess</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__delete_podcast</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">)</span>
-</code></pre></div>
-        </details>
     </div>
 
   </div>
@@ -1683,20 +761,6 @@ PodcastRecommendation        </code>
     </tr>
   </tbody>
 </table>
-        <details class="quote">
-          <summary>Source code in <code>podcast_recommendation/algorithm.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">delete_rtg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Deletes rating relationship</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        user_id (str): user id</span>
-<span class="sd">        podcast_id (str): podcast id</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
-        <span class="n">sess</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__delete_rtg</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">)</span>
-</code></pre></div>
-        </details>
     </div>
 
   </div>
@@ -1733,19 +797,6 @@ PodcastRecommendation        </code>
     </tr>
   </tbody>
 </table>
-        <details class="quote">
-          <summary>Source code in <code>podcast_recommendation/algorithm.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">delete_user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Deletes user</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        user_id (str): user id</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
-         <span class="n">sess</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__delete_user</span><span class="p">,</span> <span class="n">user_id</span><span class="p">)</span>
-</code></pre></div>
-        </details>
     </div>
 
   </div>
@@ -1798,28 +849,6 @@ PodcastRecommendation        </code>
     </tr>
   </tbody>
 </table>
-        <details class="quote">
-          <summary>Source code in <code>podcast_recommendation/algorithm.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">gen_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Generates data for podcast recommendation</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        df (pd.DataFrame): podcasts</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        pd.DataFrame: dataframe with attributes</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">c_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cat_based&#39;</span><span class="p">,</span> <span class="s1">&#39;cat_cnt&#39;</span><span class="p">,</span> <span class="s1">&#39;user_based&#39;</span><span class="p">,</span> <span class="s1">&#39;user_cnt&#39;</span><span class="p">,</span>
-               <span class="s1">&#39;adamic_adar&#39;</span><span class="p">,</span> <span class="s1">&#39;resource_allocation&#39;</span><span class="p">,</span> <span class="s1">&#39;link_cnt&#39;</span><span class="p">]</span>
-    <span class="n">df</span><span class="p">[</span><span class="n">c_names</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gen_data_row</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">result_type</span><span class="o">=</span><span class="s1">&#39;expand&#39;</span><span class="p">)</span>
-    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;cat_avg&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;cat_based&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;cat_cnt&#39;</span><span class="p">]</span>
-    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;user_avg&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;user_based&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;user_cnt&#39;</span><span class="p">]</span>
-    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;adar_avg&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;adamic_adar&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;link_cnt&#39;</span><span class="p">]</span>
-    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;ra_avg&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;resource_allocation&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;link_cnt&#39;</span><span class="p">]</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">df</span> 
-</code></pre></div>
-        </details>
     </div>
 
   </div>
@@ -1872,27 +901,6 @@ PodcastRecommendation        </code>
     </tr>
   </tbody>
 </table>
-        <details class="quote">
-          <summary>Source code in <code>podcast_recommendation/algorithm.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">gen_data_row</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">:</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">list</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Helper for gen_data</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        row (pd.Series): row of data</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        list: list of attributes</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">u_id</span><span class="p">,</span> <span class="n">p_id</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;user_id&#39;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;podcast_id&#39;</span><span class="p">]</span>
-
-    <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cat_based</span><span class="p">(</span><span class="n">u_id</span><span class="p">,</span> <span class="n">p_id</span><span class="p">)</span>
-    <span class="n">result</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_user_based</span><span class="p">(</span><span class="n">u_id</span><span class="p">,</span> <span class="n">p_id</span><span class="p">)</span>
-    <span class="n">result</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">adamic_adar</span><span class="p">(</span><span class="n">u_id</span><span class="p">,</span> <span class="n">p_id</span><span class="p">)</span>
-    <span class="n">result</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource_allocation</span><span class="p">(</span><span class="n">u_id</span><span class="p">,</span> <span class="n">p_id</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">result</span>
-</code></pre></div>
-        </details>
     </div>
 
   </div>
@@ -1945,28 +953,6 @@ PodcastRecommendation        </code>
     </tr>
   </tbody>
 </table>
-        <details class="quote">
-          <summary>Source code in <code>podcast_recommendation/algorithm.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">gen_df</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Generates df with podcasts of interest</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        user_id (str): user id</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        pd.DataFrame: dataframe with podcasts</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">podcasts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gen_podcasts</span><span class="p">(</span><span class="n">user_id</span><span class="p">)</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;podcast_id&#39;</span><span class="p">:</span><span class="n">podcasts</span><span class="p">})</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">pod</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pod</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="n">pod</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">pod</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mf">0.2</span><span class="p">]</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;podcast_id&#39;</span><span class="p">]</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="mi">50</span><span class="p">,:]</span>
-    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;user_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">user_id</span>
-    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="mi">50</span><span class="p">,</span> <span class="mi">1</span><span class="p">:]</span>
-</code></pre></div>
-        </details>
     </div>
 
   </div>
@@ -2019,23 +1005,6 @@ PodcastRecommendation        </code>
     </tr>
   </tbody>
 </table>
-        <details class="quote">
-          <summary>Source code in <code>podcast_recommendation/algorithm.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">gen_podcasts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">list</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Helper for gen_df. Uses paths (user)-[*3]-&gt;(podcast)</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        user_id (str): user id</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        list: list with podcasts</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__gen_podcasts</span><span class="p">,</span> <span class="n">user_id</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">result</span>
-</code></pre></div>
-        </details>
     </div>
 
   </div>
@@ -2090,25 +1059,6 @@ PodcastRecommendation        </code>
     </tr>
   </tbody>
 </table>
-        <details class="quote">
-          <summary>Source code in <code>podcast_recommendation/algorithm.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_cat_based</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">list</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Generates data from paths</span>
-<span class="sd">    (user)-&gt;(podcast)-&gt;(category)&lt;-(podcast)</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        user_id (str): user id</span>
-<span class="sd">        podcast_id (str): podcast id</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        list: sum of ratings and count of paths</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__get_cat_based</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">result</span>
-</code></pre></div>
-        </details>
     </div>
 
   </div>
@@ -2163,25 +1113,6 @@ PodcastRecommendation        </code>
     </tr>
   </tbody>
 </table>
-        <details class="quote">
-          <summary>Source code in <code>podcast_recommendation/algorithm.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_user_based</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">list</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Generates data from paths</span>
-<span class="sd">    (user)-&gt;(podcast)&lt;-(user)-&gt;(podcast)</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        user_id (str): user id</span>
-<span class="sd">        podcast_id (str): podcast id</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        list: sum of ratings and count of paths</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__get_user_based</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">result</span>
-</code></pre></div>
-        </details>
     </div>
 
   </div>
@@ -2234,29 +1165,6 @@ PodcastRecommendation        </code>
     </tr>
   </tbody>
 </table>
-        <details class="quote">
-          <summary>Source code in <code>podcast_recommendation/algorithm.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">recommend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Generates podcast recommendation for user</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        user_id (str): user id</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        pd.DataFrame: podcasts and probabilities</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gen_df</span><span class="p">(</span><span class="n">user_id</span><span class="p">)</span>
-
-    <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gen_data</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;proba&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lr</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">])[:,</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s1">&#39;proba&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-    <span class="n">pod</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pod</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;podcast_id&#39;</span><span class="p">)</span>
-    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;podcast_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">pod</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">])</span>
-
-    <span class="k">return</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;proba&#39;</span><span class="p">,</span> <span class="s1">&#39;title&#39;</span><span class="p">]]</span>
-</code></pre></div>
-        </details>
     </div>
 
   </div>
@@ -2310,24 +1218,6 @@ PodcastRecommendation        </code>
     </tr>
   </tbody>
 </table>
-        <details class="quote">
-          <summary>Source code in <code>podcast_recommendation/algorithm.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">resource_allocation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">list</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Generates data from resource allocation metric</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        user_id (str): user id</span>
-<span class="sd">        podcast_id (str): podcast id</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        list: resource allocation and count of paths</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">write_transaction</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__resource_allocation</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">podcast_id</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">result</span>
-</code></pre></div>
-        </details>
     </div>
 
   </div>
