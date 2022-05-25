@@ -101,54 +101,54 @@
 <p>La base de datos consiste de 3 tablas principales y 2 tablas con atributos de entrenamiento. </p>
 <h2 id="tablas-principales">Tablas Principales</h2>
 <p>Las tablas principales son: 
-+ <a href="#categories-sample">categories.sample.csv</a>
-+ <a href="#podcast-sample-title">podcast_sample_title.csv</a>
-+ <a href="#ratings-sample">ratings_sample.csv</a></p>
+- <a href="#categories-sample">categories.sample.csv</a>
+- <a href="#podcast-sample-title">podcast_sample_title.csv</a>
+- <a href="#ratings-sample">ratings_sample.csv</a></p>
 <h3 id="categories-sample">Categories Sample</h3>
 <p>La tabla consta de 3 columnas:
-+ podcast_id: id para el podcast
-+ category: nombre de la categoria
-+ category_id: id de la categoria</p>
+- podcast_id: id para el podcast
+- category: nombre de la categoria
+- category_id: id de la categoria</p>
 <p>Esta tabla es utilizada para generar las relaciones <code>IsA</code> en Neo4j. <br>
 <a href="https://github.com/ManuelAlejandroMartinezFlores/PodcastRecommendation/blob/main/src/podcast_recommendation/data/categories_sample.csv">Acceder archivo</a></p>
 <h3 id="podcast-sample-title">Podcast Sample Title</h3>
 <p>La tabla consta de 2 columnas:
-+ podcast_id: id del podcast
-+ title: título del podcast</p>
+- podcast_id: id del podcast
+- title: título del podcast</p>
 <p>La tabla es utilizada para mostrar los títulos en las recomendaciones. <br>
 <a href="https://github.com/ManuelAlejandroMartinezFlores/PodcastRecommendation/blob/main/src/podcast_recommendation/data/podcast_sample_title.csv">Acceder archivo</a></p>
 <h3 id="ratings-sample">Ratings Sample</h3>
 <p>La tabla consta de 4 columnas:
-+ podcast_id: id del podcast evaluado
-+ user_id: id del usuario realizando la evaluación
-+ rating: rating del podcast entre 1 y 5
-+ liked: si rating es mayor a 2 o no</p>
+- podcast_id: id del podcast evaluado
+- user_id: id del usuario realizando la evaluación
+- rating: rating del podcast entre 1 y 5
+- liked: si rating es mayor a 2 o no</p>
 <p>Esta tabla es utilizada para generar las relaciones <code>Rating</code> en Neo4j. <br>
 <a href="https://github.com/ManuelAlejandroMartinezFlores/PodcastRecommendation/blob/main/src/podcast_recommendation/data/ratings_sample.csv">Acceder archivo</a></p>
 <h2 id="tablas-de-entrenamiento">Tablas de entrenamiento</h2>
 <p>Las tablas de entrenamiento son:
-+ <a href="">x_train.csv</a>
-+ <a href="">y_train.csv</a></p>
+- <a href="#x-train">x_train.csv</a>
+- <a href="#y-train">y_train.csv</a></p>
 <h3 id="x-train">X Train</h3>
 <p>La tabla consta de 13 columnas:
-+ podcast_id: id del podcast
-+ user_id: id del usuario
-+ cat_based: suma de ratings obtenidos en paths de la forma <code>(User)-&gt;(Podcast)&lt;-(Category)-&gt;(Podcast)</code>
-+ cat_cnt: cuenta de paths de la forma <code>(User)-&gt;(Podcast)-&gt;(Category)&lt;-(Podcast)</code> 
-+ user_based: suma de ratings obtenidos en paths de la forma <code>(User)-&gt;(Podcast)&lt;-(User)-&gt;(Podcast)</code>
-+ user_cnt: cuenta de paths de la forma <code>(User)-&gt;(Podcast)&lt;-(User)-&gt;(Podcast)</code>
-+ adamic_adar: multiplicación de rating con la métrica Adamic Adar entre podcasts de la forma <code>(User)-&gt;(Podcast)--()--(Podcast)</code>
-+ resource_allocation: multiplicación de rating con la métrica Resource Allocation entre podcasts de la forma <code>(User)-&gt;(Podcast)--()--(Podcast)</code>
-+ link_cnt: cuenta de paths de la forma <code>(User)-&gt;(Podcast)--()--(Podcast)</code>
-+ cat_avg: cat_based dividido entre cat_cnt
-+ user_avg: user_based dividido entre user_cnt
-+ adar: adamic_adar dividido entre link_cnt
-+ ra_avg: resource_allocation dividido entre link_cnt</p>
+- podcast_id: id del podcast
+- user_id: id del usuario
+- cat_based: suma de ratings obtenidos en paths de la forma <code>(User)-&gt;(Podcast)&lt;-(Category)-&gt;(Podcast)</code>
+- cat_cnt: cuenta de paths de la forma <code>(User)-&gt;(Podcast)-&gt;(Category)&lt;-(Podcast)</code> 
+- user_based: suma de ratings obtenidos en paths de la forma <code>(User)-&gt;(Podcast)&lt;-(User)-&gt;(Podcast)</code>
+- user_cnt: cuenta de paths de la forma <code>(User)-&gt;(Podcast)&lt;-(User)-&gt;(Podcast)</code>
+- adamic_adar: multiplicación de rating con la métrica Adamic Adar entre podcasts de la forma <code>(User)-&gt;(Podcast)--()--(Podcast)</code>
+- resource_allocation: multiplicación de rating con la métrica Resource Allocation entre podcasts de la forma <code>(User)-&gt;(Podcast)--()--(Podcast)</code>
+- link_cnt: cuenta de paths de la forma <code>(User)-&gt;(Podcast)--()--(Podcast)</code>
+- cat_avg: cat_based dividido entre cat_cnt
+- user_avg: user_based dividido entre user_cnt
+- adar: adamic_adar dividido entre link_cnt
+- ra_avg: resource_allocation dividido entre link_cnt</p>
 <p>Esta tabla es utilzada para entrenar el modelo de regresión logística <br>
 <a href="https://github.com/ManuelAlejandroMartinezFlores/PodcastRecommendation/blob/main/src/podcast_recommendation/data/x_train.csv">Acceder archivo</a></p>
 <h3 id="y-train">Y train</h3>
 <p>Esta tabla contiene una única columna:
-+ liked: si el rating es mayor o igual a 3</p>
+- liked: si el rating es mayor o igual a 3</p>
 <p>Esta tabla es el objetivo del entrenamiento del modelo <br>
 <a href="https://github.com/ManuelAlejandroMartinezFlores/PodcastRecommendation/blob/main/src/podcast_recommendation/data/y_train.csv">Acceder archivo</a></p>
               
