@@ -13,7 +13,6 @@ pip install podcast-recommendation
 ```
 ```
 pip install podcast-recommendation==0.1.8
-
 ```
 
 ## Uso
