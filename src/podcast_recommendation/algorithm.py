@@ -1,6 +1,7 @@
 from neo4j import GraphDatabase as GD
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
+import numpy as np
 
 import pkg_resources
 import os
@@ -11,6 +12,7 @@ X_PATH = os.path.join(DATA_PATH, 'x_train.csv')
 Y_PATH = os.path.join(DATA_PATH, 'y_train.csv')
 CAT_PATH = os.path.join(DATA_PATH, 'categories_sample.csv')
 RTG_PATH = os.path.join(DATA_PATH, 'ratings_sample.csv')
+POD_PATH = os.path.join(DATA_PATH, 'podcast_sample_title.csv')
 
 class PodcastRecommendation:
     def __init__(self, uri:str, auth:str, x_path:str = None, y_path:str = None, verbose:bool = False)->None:
@@ -42,6 +44,9 @@ class PodcastRecommendation:
         if verbose: print("Training model")
         self.lr.fit(X[self.features], Y.values.reshape(1,-1)[0])
         if verbose: print("Training complete")
+        
+        if verbose: print("Reading podcasts")
+        self.pod = pd.read_csv(POD_PATH)
     
     def build_graph(self, cat_path:str = None, rtg_path:str = None, delete_all:bool = True,
                     verbose:bool = False)->None:
@@ -163,10 +168,15 @@ class PodcastRecommendation:
             pd.DataFrame: podcasts and probabilities
         """
         df = self.gen_df(user_id)
+        
         df = self.gen_data(df)
         df['proba'] = self.lr.predict_proba(df[self.features])[:,1]
         df = df.sort_values(by='proba', ascending=False)
-        return df[['podcast_id', 'proba']]
+        
+        pod = self.pod.copy().set_index('podcast_id')
+        df['title'] = df['podcast_id'].map(pod['title'])
+        
+        return df[['proba', 'title']]
     
     def gen_data(self, df:pd.DataFrame)->pd.DataFrame:
         """Generates data for podcast recommendation
@@ -285,12 +295,14 @@ class PodcastRecommendation:
         )
         tx.run(query, user_id=user_id)
         
-    def create_podcast(self, podcast_id:str)->None:
+    def create_podcast(self, podcast_id:str, title:str)->None:
         """Creates a podcast
 
         Args:
             podcast_id (str): podcast id
+            title (str): title
         """
+        self.pod.loc[len(self.pod)] = [podcast_id, title]
         with self.driver.session() as sess:
             sess.write_transaction(
                 self.__create_podcast, podcast_id)
@@ -534,6 +546,11 @@ class PodcastRecommendation:
         """
         podcasts = self.gen_podcasts(user_id)
         df = pd.DataFrame({'podcast_id':podcasts})
+        if len(df) == 0:
+            pod = self.pod.copy()
+            df = pod[np.random.rand(len(pod)) < 0.2]
+            df = df['podcast_id']
+            df = df.iloc[:50,:]
         df['user_id'] = user_id
         return df.drop_duplicates().reset_index().iloc[:50, 1:]
         

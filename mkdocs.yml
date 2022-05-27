@@ -11,5 +11,6 @@ plugins:
 
 nav:
     - Home: index.md
+    - Database: database.md
     - Code Reference:
         - Algorithm: algorithm-reference.md
